@@ -4,3 +4,4 @@ const asyncHandler = (requestHandler) =>{
         catch((err)=>next(err)) // if error occur move to next middleware 
     }
 }
+export {asyncHandler}

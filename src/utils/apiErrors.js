@@ -10,7 +10,7 @@ class ApiErrors extends Error {
         stack = ""
     ) {
         // When a class extends another class,
-        // you must call super() before using this.
+        // you must call super() before using this.xyzzz
         super(message);  // call the parent class
 
         this.statusCode = statusCode;
