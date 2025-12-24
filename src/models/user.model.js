@@ -57,7 +57,7 @@ userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();  // if password is not modified i.e there is the change in other fields like name,etc
 
     this.password = await bcrypt.hash(this.password, 10) // 10 is the strength of the lock 🔒 bcrypt repeats the hashing process 10 times
-    next()  // moddleware says : I’m done, you can continue now.
+    next  // moddleware says : I’m done, you can continue now.
 })
 
 

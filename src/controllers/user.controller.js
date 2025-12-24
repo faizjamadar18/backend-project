@@ -1,8 +1,8 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiErrors } from "../utils/apiErrors.js"
 import { User } from "../models/user.model.js"
-import {uploadOnCloudinary} from "../utils/cloudinary.js"
-import {ApiResponseError} from "../utils/apiResponseError.js"
+import { uploadOnCloudinary } from "../utils/cloudinary.js"
+import { ApiResponseError } from "../utils/apiResponseError.js"
 
 const UserRegister = asyncHandler(async (req, res) => {
 
@@ -18,7 +18,7 @@ const UserRegister = asyncHandler(async (req, res) => {
 
 
     // 1>  get user details from frontend
-    const { username, email, fullName, password } = req.body()
+    const { username, email, fullName, password } = req.body
 
 
     // 2> validation - not empty
@@ -43,47 +43,85 @@ const UserRegister = asyncHandler(async (req, res) => {
     }
 
 
+    // console.log(req.files);
+    // [Object: null prototype] {
+    //   avatar: [
+    //     {
+    //       fieldname: 'avatar',
+    //       originalname: 'Screenshot 2025-12-07 112104.png',
+    //       encoding: '7bit',
+    //       mimetype: 'image/png',
+    //       destination: './public/temp',
+    //       filename: 'Screenshot 2025-12-07 112104.png',
+    //       path: 'public\\temp\\Screenshot 2025-12-07 112104.png',
+    //       size: 487
+    //     }
+    //   ],
+    //   coverImage: [
+    //     {
+    //       fieldname: 'coverImage',
+    //       originalname: 'Screenshot 2025-12-07 131223.png',
+    //       encoding: '7bit',
+    //       mimetype: 'image/png',
+    //       destination: './public/temp',
+    //       filename: 'Screenshot 2025-12-07 131223.png',
+    //       path: 'public\\temp\\Screenshot 2025-12-07 131223.png',
+    //       size: 22131
+    //     }
+    //   ]
+    // }
+
+
+
+
     // 4> check for images, check for avatar:
     const avatarLocalPath = req.files?.avatar[0]?.path;
-    const coverImageLocalPath = req.files?.coverImage[0]?.path;
-    if(!avatarLocalPath){
-        throw new ApiErrors(400,"Avatar Field is required")
+    // const coverImageLocalPath = req.files?.coverImage[0]?.path;
+    let coverImageLocalPath ;
+    if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+        coverImageLocalPath = req.files.coverImage[0].path
+    }
+    // agr req.files agar hai aur phir usme coverImage wala array agr array hai aur phir agr coverImage wala array ki lenght > 0 hai
+
+
+    if (!avatarLocalPath) {
+        throw new ApiErrors(400, "Avatar Field is required")
     }
 
 
     // 5> upload them to cloudinary, avatar and coverImage
     const avatar = await uploadOnCloudinary(avatarLocalPath)
     const coverImage = await uploadOnCloudinary(coverImageLocalPath)
-    if(!avatar){
-        throw new ApiErrors(400,"Avatar Field is required")
+    if (!avatar) {
+        throw new ApiErrors(400, "Avatar Field is required")
     }
 
 
     // 6> create user object - create entry in db
-    const user = User.create({
-        username : username.toLowerCase(),
+    const user = await User.create({
+        username: username.toLowerCase(),
         email,
         fullName,
-        avatar : avatar.url,
-        coverImage : coverImage?.url || "",
+        avatar: avatar.url,
+        coverImage: coverImage?.url || "",
         password
     })
 
 
     // 7> remove password and refresh token field from response
-    const createdUser = User.findById(user._id).select(
+    const createdUser = await User.findById(user._id).select(
         "-password -refreshToken"
     )
 
 
     // 8> check for user creation
-    if(!createdUser){
-        throw new ApiErrors(500,"Something went wrong in the server")
+    if (!createdUser) {
+        throw new ApiErrors(500, "Something went wrong in the server")
     }
 
     // 9> return res
     return res.status(200).json(
-        new ApiResponseError(201,createdUser,"User Registered Successfully")
+        new ApiResponseError(201, createdUser, "User Registered Successfully")
     )
 
 })

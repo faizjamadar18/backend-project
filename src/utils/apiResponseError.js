@@ -1,7 +1,7 @@
 class ApiResponseError {
     constructor(statusCode,data,message = "SUCCES"){
         this.statusCode = statusCode
-        this.data = null
+        this.data = data
         this.message = message
         this.success = statusCode < 400
     }
