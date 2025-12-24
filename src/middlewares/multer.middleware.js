@@ -3,6 +3,8 @@ import multer from "multer";
 // used to store locally ur files 
 // mutler is always used as a middleware
 
+// copied from multer docs 
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, "./public/temp")

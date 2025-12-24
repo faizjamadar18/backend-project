@@ -13,4 +13,11 @@ app.use(express.urlencoded({extended:true , limit : "16kb"}))  //extracting data
 app.use(express.static("public"))  // for storing some files on the server publically
 app.use(cookieParser())    // for performing CRUD operation of cookie 
 
+// import routers : 
+import UserRouter from "./routes/user.route.js"
+// route declaration 
+app.use("/api/v1/users",UserRouter)
+// localhost:3000/api/v1/users/register
+
+
 export {app} 
